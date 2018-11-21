@@ -22,7 +22,7 @@ namespace BookStore.Models
         public string Title { get; set; }
         public string Author { get; set; }
         public decimal Price { get; set; }
-        public IList<Address> RandomCollection { get; set; }
+        public IList<Review> Reviews { get; set; }
 
         public IList<byte[]> Others { get; set; }
         public Date Date { get; set; }
@@ -84,6 +84,13 @@ namespace BookStore.Models
         public string City { get; set; }
         public string Street { get; set; }
     }
+
+    public class Review
+    {
+        public int Rating { get; set; }
+        public string Comment { get; set; }
+    }
+
 
     public class SubAddress:Address
     {

@@ -14,15 +14,19 @@ namespace BookStore.Controllers
     public class BooksController : ODataController
     {
         private BookStoreContext _db;
-
+        public static List<Book> _myBooks = new List<Book>();
         public BooksController(BookStoreContext context)
         {
-            _db = context;
+            if (_db == null)
+            {
+                _db = context;
+            }
             if (context.Books.Count() == 0)
             {
                 foreach (var b in DataSource.GetBooks())
                 {
                     context.Books.Add(b);
+                    _myBooks.Add(b);
                     //context.Press.Add(b.Presses[0]);
                 }
                 context.SaveChanges();
@@ -32,31 +36,29 @@ namespace BookStore.Controllers
         [EnableQuery(MaxExpansionDepth =5)]
         public IActionResult Get()
         {
-            return Ok(_db.Books);
+            return Ok(_myBooks);
         }
 
         [EnableQuery]
         public IActionResult Get(int key)
         {
-            return Ok(_db.Books.FirstOrDefault(c => c.Id == key));
+            return Ok(_myBooks.FirstOrDefault(c => c.Id == key));
         }
 
         [EnableQuery]
         public IActionResult Post([FromBody]Book book)
         {
-            _db.Books.Add(book);
+            _myBooks.Add(book);
             _db.SaveChanges();
             return Created(book);
         }
 
         [EnableQuery]
-        public IActionResult PostToRandomCollection(int key, [FromBody]SubAddress newInt)
+        public IActionResult PostToReviews(int key, [FromBody]Review newReview)
         {
-            Book ToBeEdited = _db.Books.FirstOrDefault(c => c.Id == key);
-            ToBeEdited.RandomCollection.Add(newInt);
-            _db.Books.Update(ToBeEdited);
-            _db.SaveChanges();
-            return Ok(newInt);
+            Book ToBeEdited = _myBooks.FirstOrDefault(c => c.Id == key);
+            ToBeEdited.Reviews.Add(newReview);
+            return Ok(newReview);
         }
 
         [EnableQuery]

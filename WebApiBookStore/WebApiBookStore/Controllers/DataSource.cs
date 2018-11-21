@@ -35,11 +35,11 @@ namespace BookStore.Controllers
                 Title = "Essential C#5.0",
                 Author = "Mark Michaelis",
                 Price = 59.99m,
-                Location = new Address { City = "Redmond", Street = "156TH AVE NE" }, //new List<Address>{ 
-                RandomCollection = new List<Address>() {
-                    new Address { City = "Bellevue", Street = "Main ST" },
-                    new Address { City = "Bellevue2", Street = "Main ST2" },
-                    new Address { City = "Bellevue3", Street = "Main ST3" },
+                Location = new Address { City = "Redmond", Street = "156TH AVE NE" }, 
+                Reviews = new List<Review>() {
+                    new Review { Rating = 4, Comment = "A good book" },
+                    new Review { Rating = 1, Comment = "I don't like C#" },
+                    new Review { Rating = 5, Comment = "I liked how the author explained delegates." }
                 },
                 Others = new List<byte[]>
                 {
@@ -69,7 +69,11 @@ namespace BookStore.Controllers
                 Price = 49.99m,
                 Binary = new byte[] { 2, 4, 5 },
                 Location = new Address { City = "Bellevue", Street = "Main ST" }, //new List<Address>
-                RandomCollection = new List<Address>(),
+                Reviews = new List<Review>() {
+                    new Review { Rating = 4, Comment = "good book" },
+                    new Review { Rating = 1, Comment = "bad book" },
+                    new Review { Rating = 1, Comment = "I don't like C#" }
+                },
                 Others = new List<byte[]>(),
                 Press = new Press()
                 {
@@ -102,7 +106,11 @@ namespace BookStore.Controllers
                 Price = 49.99m,
                 Binary = new byte[] { 2, 4, 5 },
                 Location = new Address { City = "Bellevue", Street = "Main ST" }, //new List<Address>
-                RandomCollection = new List<Address>(),
+                Reviews = new List<Review>() {
+                    new Review { Rating = 4, Comment = "good book" },
+                    new Review { Rating = 1, Comment = "bad book" },
+                    new Review { Rating = 1, Comment = "I don't like C#" }
+                },
                 Others = new List<byte[]>(),
                 Press = new Press()
                 {

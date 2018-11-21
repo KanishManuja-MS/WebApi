@@ -11,6 +11,7 @@ namespace BookStore.Models
         public BookStoreContext(DbContextOptions<BookStoreContext> options)
           : base(options)
         {
+
         }
 
         public DbSet<Book> Books { get; set; }
@@ -20,7 +21,7 @@ namespace BookStore.Models
         {
            modelBuilder.Entity<Book>().OwnsOne(c => c.Location);
             modelBuilder.Entity<Book>().Ignore(c => c.Others);
-            modelBuilder.Entity<Book>().Ignore(c => c.RandomCollection);
+           modelBuilder.Entity<Book>().Ignore(c => c.Reviews);
         }
     }
 }
