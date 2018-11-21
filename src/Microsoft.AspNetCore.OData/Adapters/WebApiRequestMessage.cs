@@ -135,10 +135,23 @@ namespace Microsoft.AspNet.OData.Adapters
         /// Get the next page link for a given page size.
         /// </summary>
         /// <param name="pageSize">The page size.</param>
+        /// <param name="skiptokenValue">value that needs to be assigned to skipToken</param>
+        /// <returns></returns>
+        public Uri GetNextPageLink(int pageSize, string skiptokenValue)
+        {
+            this.Context.NextLink = this.innerRequest.GetNextPageLink(pageSize,skiptokenValue);
+            return this.Context.NextLink;
+        }
+
+        /// <summary>
+        /// Get the next page link for a given page size.
+        /// </summary>
+        /// <param name="pageSize">The page size.</param>
         /// <returns></returns>
         public Uri GetNextPageLink(int pageSize)
         {
-            return this.innerRequest.GetNextPageLink(pageSize);
+            this.Context.NextLink = this.innerRequest.GetNextPageLink(pageSize);
+            return this.Context.NextLink;
         }
 
         /// <summary>

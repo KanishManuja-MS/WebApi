@@ -14,7 +14,7 @@ namespace Microsoft.AspNet.OData
     /// </summary>
     internal static partial class GetNextPageHelper
     {
-        internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize)
+        internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize, string skipTokenValue = "")
         {
             Contract.Assert(requestUri != null);
             Contract.Assert(queryParameters != null);
@@ -23,10 +23,17 @@ namespace Microsoft.AspNet.OData
             StringBuilder queryBuilder = new StringBuilder();
 
             int nextPageSkip = pageSize;
+            
+            //If no value for skiptoken is provided; revert to using skip 
+            bool useSkipToken = true;
+            if (String.IsNullOrWhiteSpace(skipTokenValue))
+            {
+                useSkipToken = false;
+            }
 
             foreach (KeyValuePair<string, string> kvp in queryParameters)
             {
-                string key = kvp.Key;
+                string key = kvp.Key.ToLowerInvariant();
                 string value = kvp.Value;
                 switch (key)
                 {
@@ -34,22 +41,34 @@ namespace Microsoft.AspNet.OData
                         int top;
                         if (Int32.TryParse(value, out top))
                         {
-                            // There is no next page if the $top query option's value is less than or equal to the page size.
+                            // There is no next page if the $top query option's value is less than or equal to the page size. You should not call this API if top <= pagesize.
                             Contract.Assert(top > pageSize);
                             // We decrease top by the pageSize because that's the number of results we're returning in the current page
-                            value = (top - pageSize).ToString(CultureInfo.InvariantCulture);
+                            if (top > pageSize)
+                            {
+                                value = (top - pageSize).ToString(CultureInfo.InvariantCulture);
+                            }
                         }
                         break;
                     case "$skip":
-                        int skip;
-                        if (Int32.TryParse(value, out skip))
+                        //Need to increment skip only if we are not using skiptoken 
+                        if (!useSkipToken) 
                         {
-                            // We increase skip by the pageSize because that's the number of results we're returning in the current page
-                            nextPageSkip += skip;
+                            int skip = 0;
+                            if (Int32.TryParse(value, out skip))
+                            {
+                                // We increase skip by the pageSize because that's the number of results we're returning in the current page
+                                nextPageSkip += skip;
+                            }
                         }
                         continue;
                     default:
                         break;
+                }
+
+                if ((key == "$skip" && useSkipToken) || (key == "$skiptoken" && useSkipToken))
+                {
+                    continue;
                 }
 
                 if (key.Length > 0 && key[0] == '$')
@@ -69,8 +88,14 @@ namespace Microsoft.AspNet.OData
                 queryBuilder.Append('&');
             }
 
-            queryBuilder.AppendFormat("$skip={0}", nextPageSkip);
-
+            if (useSkipToken)
+            {
+                queryBuilder.AppendFormat("$skiptoken={0}", skipTokenValue);
+            }
+            else
+            {
+                queryBuilder.AppendFormat("$skip={0}", nextPageSkip);
+            }
             UriBuilder uriBuilder = new UriBuilder(requestUri)
             {
                 Query = queryBuilder.ToString()

@@ -123,6 +123,11 @@ namespace Microsoft.AspNet.OData.Query
         public SkipQueryOption Skip { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="SkipTokenQueryOption"/>.
+        /// </summary>
+        public SkipTokenQueryOption SkipToken { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="TopQueryOption"/>.
         /// </summary>
         public TopQueryOption Top { get; private set; }
@@ -382,6 +387,11 @@ namespace Microsoft.AspNet.OData.Query
                 result = orderBy.ApplyTo(result, querySettings);
             }
 
+            if (IsAvailableODataQueryOption(SkipToken, AllowedQueryOptions.SkipToken))
+            {
+                result = SkipToken.ApplyTo(result, querySettings, orderBy);
+            }
+
             AddAutoSelectExpandProperties();
 
             if (SelectExpand != null)
@@ -422,12 +432,20 @@ namespace Microsoft.AspNet.OData.Query
             if (pageSize > 0)
             {
                 bool resultsLimited;
-                result = LimitResults(result, pageSize, out resultsLimited);
+                result = LimitResults(result, pageSize, out resultsLimited);               
                 if (resultsLimited && InternalRequest.RequestUri != null && InternalRequest.RequestUri.IsAbsoluteUri &&
                     InternalRequest.Context.NextLink == null)
                 {
-                    Uri nextPageLink = InternalRequest.GetNextPageLink(pageSize);
-                    InternalRequest.Context.NextLink = nextPageLink;
+                    DefaultQuerySettings settings = Context.RequestContainer.GetRequiredService<DefaultQuerySettings>();
+                    if (settings.EnableSkipToken)
+                    {
+                        string skipTokenValue = SkipTokenQueryOption.GetSkipTokenValue(result, this.Context.Model, OrderBy);
+                        InternalRequest.GetNextPageLink(pageSize, skipTokenValue);
+                    }
+                    else
+                    {
+                        InternalRequest.GetNextPageLink(pageSize);
+                    }
                 }
             }
 
@@ -908,6 +926,7 @@ namespace Microsoft.AspNet.OData.Query
                         break;
                     case "$skiptoken":
                         RawValues.SkipToken = kvp.Value;
+                        SkipToken = new SkipTokenQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
                     case "$deltatoken":
                         RawValues.DeltaToken = kvp.Value;
