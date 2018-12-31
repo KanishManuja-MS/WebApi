@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.OData.Common;
+using Microsoft.AspNet.OData.Formatter.Serialization;
 using Microsoft.AspNet.OData.Interfaces;
+using Microsoft.AspNet.OData.Query;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,6 +64,11 @@ namespace Microsoft.AspNet.OData
         public Uri NextLink { get; set; }
 
         /// <summary>
+        /// Gets or sets the next link function for the OData response.
+        /// </summary>
+        public Func<object, ODataSerializerContext, Uri> NextLinkFunc { get; set; }
+
+        /// <summary>
         /// Gets or sets the batch route data.
         /// </summary>
         public RouteValueDictionary BatchRouteData { get; set; }
@@ -110,6 +117,16 @@ namespace Microsoft.AspNet.OData
         /// Gets or sets the total count function for the OData response.
         /// </summary>
         public Func<long> TotalCountFunc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total count function for the OData response.
+        /// </summary>
+        public int PageSize { get; set; }
+
+        /// <summary>
+        /// Gets the implementation for skiptoken for generating a value
+        /// </summary>
+        public ODataQueryOptions QueryOptions { get; set; }
 
         /// <summary>
         /// Gets or sets the parsed OData <see cref="ApplyClause"/> of the request.

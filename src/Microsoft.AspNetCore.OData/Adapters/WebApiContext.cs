@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNet.OData.Formatter.Serialization;
 using Microsoft.AspNet.OData.Interfaces;
+using Microsoft.AspNet.OData.Query;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 using IODataRoutingConvention = Microsoft.AspNet.OData.Routing.Conventions.IODataRoutingConvention;
@@ -46,6 +48,15 @@ namespace Microsoft.AspNet.OData.Adapters
         {
             get { return this.innerFeature.NextLink; }
             set { this.innerFeature.NextLink = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the next link function for the OData response.
+        /// </summary>
+        public Func<object, ODataSerializerContext, Uri> NextLinkFunc
+        {
+            get { return this.innerFeature.NextLinkFunc; }
+            set { this.innerFeature.NextLinkFunc = value; }
         }
 
         /// <summary>
@@ -92,12 +103,31 @@ namespace Microsoft.AspNet.OData.Adapters
         }
 
         /// <summary>
+        /// Gets or sets the parsed OData <see cref="SelectExpandClause"/> of the request.
+        /// </summary>
+        public ODataQueryOptions QueryOptions
+        {
+            get { return this.innerFeature.QueryOptions; }
+            set { this.innerFeature.QueryOptions = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the total count for the OData response.
         /// </summary>
         /// <value><c>null</c> if no count should be sent back to the client.</value>
         public long? TotalCount
         {
             get { return this.innerFeature.TotalCount; }
+        }
+
+        /// <summary>
+        /// Gets or sets the total count for the OData response.
+        /// </summary>
+        /// <value><c>null</c> if no count should be sent back to the client.</value>
+        public int PageSize
+        {
+            get { return this.innerFeature.PageSize; }
+            set { this.innerFeature.PageSize = value; }
         }
 
         /// <summary>

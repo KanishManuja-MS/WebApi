@@ -9,6 +9,7 @@ using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Common;
+using Microsoft.AspNet.OData.Interfaces;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -123,11 +124,11 @@ namespace Microsoft.AspNet.OData.Formatter.Serialization
             // save this for later to support JSON odata.streaming.
             Uri nextPageLink = resourceSet.NextPageLink;
             resourceSet.NextPageLink = null;
-
             writer.WriteStart(resourceSet);
-
+            object lastMember = null;
             foreach (object item in enumerable)
             {
+                lastMember = item;
                 if (item == null || item is NullEdmComplexObject)
                 {
                     if (elementType.IsEntity())
@@ -155,7 +156,10 @@ namespace Microsoft.AspNet.OData.Formatter.Serialization
             {
                 resourceSet.NextPageLink = nextPageLink;
             }
-
+            else if (writeContext.InternalRequest != null && writeContext.InternalRequest.Context.NextLinkFunc != null)
+            {
+                resourceSet.NextPageLink = writeContext.InternalRequest.Context.NextLinkFunc(lastMember, writeContext);
+            }
             writer.WriteEnd();
         }
 
@@ -206,7 +210,10 @@ namespace Microsoft.AspNet.OData.Formatter.Serialization
                 }
                 else if (writeContext.Request != null)
                 {
-                    resourceSet.NextPageLink = writeContext.InternalRequest.Context.NextLink;
+                    if (writeContext.InternalRequest.Context.NextLink != null)
+                    {
+                        resourceSet.NextPageLink = writeContext.InternalRequest.Context.NextLink;
+                    }
                     resourceSet.DeltaLink = writeContext.InternalRequest.Context.DeltaLink;
 
                     long? countValue = writeContext.InternalRequest.Context.TotalCount;
@@ -231,7 +238,6 @@ namespace Microsoft.AspNet.OData.Formatter.Serialization
                     resourceSet.Count = countOptionCollection.TotalCount;
                 }
             }
-
             return resourceSet;
         }
 
@@ -328,12 +334,11 @@ namespace Microsoft.AspNet.OData.Formatter.Serialization
         private static Uri GetNestedNextPageLink(ODataSerializerContext writeContext, int pageSize)
         {
             Contract.Assert(writeContext.ExpandedResource != null);
-
             IEdmNavigationSource sourceNavigationSource = writeContext.ExpandedResource.NavigationSource;
             NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
             Uri navigationLink =
                 linkBuilder.BuildNavigationLink(writeContext.ExpandedResource, writeContext.NavigationProperty);
-
+            //TODO 1722: Create nextlink for nested resource while preserving query options
             if (navigationLink != null)
             {
                 return GetNextPageHelper.GetNextPageLink(navigationLink, pageSize);
