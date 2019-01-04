@@ -490,7 +490,6 @@ public class Microsoft.AspNet.OData.ODataFeature : IDisposable, IODataFeature {
 	Microsoft.AspNetCore.Routing.RouteValueDictionary BatchRouteData  { public virtual get; public virtual set; }
 	System.Uri DeltaLink  { public virtual get; public virtual set; }
 	System.Uri NextLink  { public virtual get; public virtual set; }
-	System.Func`3[[System.Object],[Microsoft.AspNet.OData.Formatter.Serialization.ODataSerializerContext],[System.Uri]] NextLinkFunc  { public virtual get; public virtual set; }
 	int PageSize  { public virtual get; public virtual set; }
 	ODataPath Path  { public virtual get; public virtual set; }
 	ODataQueryOptions QueryOptions  { public virtual get; public virtual set; }
@@ -2286,7 +2285,6 @@ public interface Microsoft.AspNet.OData.Interfaces.IODataFeature {
 	Microsoft.AspNetCore.Routing.RouteValueDictionary BatchRouteData  { public abstract get; public abstract set; }
 	System.Uri DeltaLink  { public abstract get; public abstract set; }
 	System.Uri NextLink  { public abstract get; public abstract set; }
-	System.Func`3[[System.Object],[Microsoft.AspNet.OData.Formatter.Serialization.ODataSerializerContext],[System.Uri]] NextLinkFunc  { public abstract get; public abstract set; }
 	int PageSize  { public abstract get; public abstract set; }
 	ODataPath Path  { public abstract get; public abstract set; }
 	ODataQueryOptions QueryOptions  { public abstract get; public abstract set; }
@@ -2730,6 +2728,7 @@ public class Microsoft.AspNet.OData.Query.SkipTokenQueryOption {
 
 	public IQueryable`1 ApplyTo (IQueryable`1 query, ODataQuerySettings querySettings, System.Collections.Generic.IList`1[[Microsoft.AspNet.OData.Query.OrderByNode]] orderByNodes)
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, ODataQuerySettings querySettings, System.Collections.Generic.IList`1[[Microsoft.AspNet.OData.Query.OrderByNode]] orderByNodes)
+	public static SkipTokenHandler GetSkipTokenImplementation (ODataQueryContext context)
 	public void Validate (ODataValidationSettings validationSettings)
 }
 
@@ -3401,6 +3400,7 @@ public class Microsoft.AspNet.OData.Formatter.Serialization.ODataResourceSetSeri
 
 	public virtual Microsoft.OData.ODataOperation CreateODataOperation (Microsoft.OData.Edm.IEdmOperation operation, ResourceSetContext resourceSetContext, ODataSerializerContext writeContext)
 	public virtual Microsoft.OData.ODataResourceSet CreateResourceSet (System.Collections.IEnumerable resourceSetInstance, Microsoft.OData.Edm.IEdmCollectionTypeReference resourceSetType, ODataSerializerContext writeContext)
+	public virtual System.Func`2[[System.Object],[System.Uri]] GetNextLinkGenerator (Microsoft.OData.ODataResourceSet resourceSet, System.Collections.IEnumerable resourceSetInstance, Microsoft.OData.Edm.IEdmCollectionTypeReference resourceSetType, ODataSerializerContext writeContext)
 	public virtual void WriteObject (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
 	public virtual void WriteObjectInline (object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, ODataSerializerContext writeContext)
 }
@@ -3408,9 +3408,10 @@ public class Microsoft.AspNet.OData.Formatter.Serialization.ODataResourceSetSeri
 public class Microsoft.AspNet.OData.Formatter.Serialization.ODataSerializerContext {
 	public ODataSerializerContext ()
 	public ODataSerializerContext (ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty)
-	public ODataSerializerContext (ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty, ODataQueryOptions queryOptions)
+	public ODataSerializerContext (ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty, ODataQueryOptions queryOptions, Microsoft.OData.UriParser.ExpandedNavigationSelectItem expandedItem)
 
 	Microsoft.OData.Edm.IEdmProperty EdmProperty  { public get; public set; }
+	Microsoft.OData.UriParser.ExpandedNavigationSelectItem ExpandedNavigationSelectItem  { public get; public set; }
 	ResourceContext ExpandedResource  { public get; public set; }
 	System.Collections.Generic.IDictionary`2[[System.Object],[System.Object]] Items  { public get; }
 	ODataMetadataLevel MetadataLevel  { public get; public set; }
@@ -3439,6 +3440,7 @@ public class Microsoft.AspNet.OData.Formatter.Serialization.SelectExpandNode {
 	public SelectExpandNode (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.Edm.IEdmModel model)
 
 	System.Collections.Generic.IDictionary`2[[Microsoft.OData.Edm.IEdmNavigationProperty],[Microsoft.OData.UriParser.SelectExpandClause]] ExpandedNavigationProperties  { public get; }
+	System.Collections.Generic.IDictionary`2[[Microsoft.OData.Edm.IEdmNavigationProperty],[Microsoft.OData.UriParser.ExpandedNavigationSelectItem]] ExpandedNavigationPropertiesWithExpandedItem  { public get; }
 	bool SelectAllDynamicProperties  { public get; }
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmAction]] SelectedActions  { public get; }
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmStructuralProperty]] SelectedComplexProperties  { public get; }
