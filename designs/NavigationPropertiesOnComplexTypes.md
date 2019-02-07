@@ -7,18 +7,21 @@ In WebAPI, navigation properties were only allowed on entity types. This design 
 We will ensure that the requests in the table below are supported.   
 
 |Request	| Template |
-|---------|:---------|
+|:-------:|:---------:|
+|GET |	{resource-path}?$expand=NavigationProperty |
+|GET |	{resource-path}?$expand=Cast/NavigationProperty |
+|GET |	{resource-path}?$expand=ComplexProperty/Cast/NavigationProperty |
+|GET |	{resource-path}?$expand=ComplexProperty/NavigationProperty |
+|GET | {resource-path}?$expand = ComplexProperty/NestedComplexProperty/NavigationProperty |
+|GET |	{collection-resource-path}/{key}?$expand = ComplexProperty/NavigationProperty |
+|GET | {collection-resource-path}/{key}?$expand = ComplexProp1/NavProp1, ComplexProp2/NavProp2 |
+|GET| {resource-path}?$expand=ComplexProperty/NavigationProperty({query-options}) |
+|GET| {resource-path}?$expand = ComplexProp/NestedComplexProperty/NavigationProperty {query-option} |
+|POST|	{resource-path}/ComplexProperty/NavigationProperty/$ref|
+|POST|	{collection-resource-path}/{key}/ ComplexProperty/NavigationProperty/$ref|
 
-|GET |	{resource-path}?$expand=ComplexProperty/NavigationProperty
-|GET	| {resource-path}?$expand = ComplexProperty/NestedComplexProperty/NavigationProperty
-|GET |	{collection-resource-path}/{key}?$expand = ComplexProperty/NavigationProperty
-|GET	| {collection-resource-path}/{key}?$expand = ComplexProp1/NavProp1, ComplexProp2/NavProp2
-|GET	| {resource-path}?$expand=ComplexProperty/NavigationProperty({query-options})
-|GET	| {resource-path}?$expand = ComplexProp/NestedComplexProperty/NavigationProperty {query-option}
-|POST |	{resource-path}/ComplexProperty/NavigationProperty/$ref
-|POST |	{collection-resource-path}/{key}/ ComplexProperty/NavigationProperty/$ref
 This list is not exhaustive by any means. It is just an indication of what kind of queries need to be supported. 
-•	The GET requests currently fail on multiple levels (Serialization, SelectExpandNode creation, SelectExpandBinder etc.).
+..*	The GET requests currently fail on multiple levels (Serialization, SelectExpandNode creation, SelectExpandBinder etc.).
 ## 2	DESIGN
 ### OVERVIEW
 From previous efforts, some of the things were already in place to support for navigation properties on complex types. For instance, convention model builder supported navigation properties on complex types, the deserialization of a payload to extract the navigation property worked correctly. 
