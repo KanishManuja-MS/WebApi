@@ -51,4 +51,4 @@ We update the navigation source for the complex property to be the navigation so
 
 
 ## Resources
-If you find it easier to read code – here is the link to the PR that has the prototype. 
+If you find it easier to read code – [here is the link to the PR that has the prototype.](https://github.com/OData/WebApi/pull/1738) 
